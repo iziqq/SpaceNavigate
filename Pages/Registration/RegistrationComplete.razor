@@ -1,0 +1,24 @@
+﻿@page "/registration/complete"
+@using System.Text.RegularExpressions;
+@using System.Net.Mail;
+@inject NavigationManager NavigationManager
+@inject ILocalStorageService localStorage
+@inject ISnackbar SnackbarService
+
+<PageTitle>Registrace dokončena</PageTitle>
+<Logo />
+<MudContainer Class="space-navigate-container">
+    <MudText Class="space-navigate-caption">Vaše výprava může začít!</MudText>
+    <MudText Class="space-navigate-text">Právě jste úspěšně založili Váš profil na platformě SpaceNavigate, nyní se můžete ponořit do prozkoumávání vesmíru.</MudText>
+
+     <MudButton OnClick="NavigateToDashboard" Variant="Variant.Filled" DisableElevation Class="space-navigate-btn mt-10">Prozkoumat vesmír</MudButton>
+ </MudContainer>
+
+ @code {
+
+    async Task NavigateToDashboard()
+    {
+        
+        NavigationManager.NavigateTo("/dashboard");
+    }
+}
