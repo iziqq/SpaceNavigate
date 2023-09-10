@@ -1,0 +1,84 @@
+﻿@page "/"
+@inject NavigationManager NavigationManager
+@using SpaceNavigate.Core.Interfaces
+@using SpaceNavigate.Core.PublicModels.User;
+@inject IUserService UserService
+@inject ISnackbar SnackbarService
+
+<PageTitle>Přihlášení do SpaceNavigate</PageTitle>
+<Logo />
+<MudContainer Class="space-navigate-container">
+    <MudText Class="space-navigate-caption">Přihlášení do aplikace</MudText>
+    <MudText Class="space-navigate-text">Pro přihlášení do aplikace použijte Vaši e-mailovou adresu a heslo</MudText>
+    <MudTextField Class="space-navigate-text-field mt-7" @bind-Value="@email" Label="E-mailová adresa" InputType="InputType.Email" Variant="Variant.Outlined" Required RequiredError="Vyplňte e-mailovou adresu" />
+     <MudTextField Class="space-navigate-text-field mt-5" @bind-Value="@password" Label="Heslo" InputType="InputType.Password" Variant="Variant.Outlined" Required RequiredError="Vyplňte heslo" />
+
+     <MudButton OnClick="TryLogin" Variant="Variant.Filled" DisableElevation Class="space-navigate-btn mt-10">Přihlásit</MudButton>
+     <MudText Class="mt-5">
+         Ještě nemáte účet ? <MudButton Variant="Variant.Text" OnClick="LoadRegisterPage" Color="Color.Primary">Registrujte se zde</MudButton>
+     </MudText>
+</MudContainer>
+
+ <style media="screen and (max-width:1120px)">
+     .space-navigate-container {
+         margin-top: 5px;
+     }
+
+     .space-navigate-caption {
+         font-size: 32px;
+         margin-top: 50px;
+     }
+
+     .space-navigate-text {
+         font-size: 14px;
+         width: 100%;
+         margin-top: 20px;
+     }
+
+     .space-navigate-text-field {
+         width: 100%;
+         height: 80px;
+     }
+
+     .space-navigate-btn {
+         width: 100%;
+         height: 50px;
+         font-size: 18px;
+     }
+ </style>
+
+ @code{
+    string email = "";
+    string password = "";
+
+    async Task TryLogin()
+    {
+        UserLogin login = new UserLogin
+            {
+                Email = email,
+                Password = password
+            };
+
+        try
+        {
+            //send request to API
+            var response = await UserService.LoginAsync(login);
+
+            //if success navigate to dashboard
+            if (response.IsSuccessStatusCode)
+                NavigationManager.NavigateTo("/dashboard");
+            else
+                SnackbarService.Add("Zadané údaje jsou nesprávné", Severity.Error);
+
+        }
+        catch
+        {
+            SnackbarService.Add("Něco se nepovedlo", Severity.Error);
+        }
+    }
+
+    private void LoadRegisterPage()
+    {
+        NavigationManager.NavigateTo("/Registration");
+    }
+}

@@ -1,0 +1,51 @@
+﻿<MudContainer Class="logo"> 
+    <MudImage Src="/Images/logo.svg" Class="img"/>
+    <MudText Class="logo-text">SpaceNavigate</MudText>
+</MudContainer>
+
+<style media="screen and (max-width:600px)">
+    .logo {
+        display: flex;
+        align-content:flex-start;
+
+    }
+
+    .img {
+        width: 25px;
+        height: 35px;
+        margin-right: 20px;
+    }
+
+    .logo-text {
+        margin-top: 0px;
+        color: #FFF;
+        font-size: 22px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 36px; /* 180% */
+    }
+</style>
+<style media="screen and (min-width:601px)">
+    .logo {
+        display: flex;
+        align-content: flex-start;
+    }
+
+    .img {
+        width: 35px;
+        height: 45px;
+        margin-right: 20px;
+    }
+
+    .logo-text {
+        margin-top: 8px;
+        color: #FFF;
+        font-size: 30px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 36px; /* 180% */
+    }
+</style>
+@code {
+
+}

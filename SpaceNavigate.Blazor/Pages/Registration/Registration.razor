@@ -1,0 +1,145 @@
+﻿@page "/registration"
+@using System.Text.RegularExpressions;
+@using System.Net.Mail;
+@using SpaceNavigate.Core.Interfaces
+@using SpaceNavigate.Core.PublicModels.Registration
+
+@inject NavigationManager NavigationManager
+@inject ILocalStorageService localStorage
+@inject ISnackbar SnackbarService
+@inject IRegistrationService RegistrationService
+
+<PageTitle>Registrace do SpaceNavigate</PageTitle>
+<Logo />
+<MudContainer Class="space-navigate-container">
+    <MudText Class="space-navigate-caption">Registrace účtu</MudText>
+    <MudText Class="space-navigate-text">Pro pokračování na nastavení hesla je potřeba úvést Vaše jméno a Vaší e-mailovou adresu.</MudText>
+    <MudTextField Class="space-navigate-text-field mt-7" @bind-Value="@fullName" Label="Celé jméno" InputType="InputType.Text" Variant="Variant.Outlined" Required RequiredError="Vyplnění jména je pro registraci povinné." Error="IsFullNameValid" />
+    <MudTextField Class="space-navigate-text-field mt-5" @bind-Value="@email" Label="E-mailová adresa" InputType="InputType.Email" Variant="Variant.Outlined" Required RequiredError="Vyplnění e-mailové adresy je pro registraci povinné." Error="IsEmailValid" />
+
+    <MudButton OnClick="CheckEmail" Variant="Variant.Filled" DisableElevation Class="space-navigate-btn mt-10">Pokračovat</MudButton>
+    <MudText Class="mt-5">
+        Máte již účet ? <MudButton Variant="Variant.Text" OnClick="LoadLoginPage" Color="Color.Primary">Přejít na přihlášení</MudButton>
+    </MudText>
+ </MudContainer>
+
+ <style media="screen and (max-width:1120px)">
+     .space-navigate-container {
+         margin-top:5px;
+     }
+
+     .space-navigate-caption {
+         font-size: 32px;
+         margin-top: 30px;
+     }
+
+     .space-navigate-text {
+         font-size: 14px;
+         font-style: normal;
+         font-weight: 400;
+         line-height: 20px; /* 142.857% */
+         width: 100%;
+         margin-top: 20px;
+     }
+
+     .space-navigate-text-field {
+         width: 100%;
+         height: 80px;
+     }
+
+     .space-navigate-btn {
+         background: linear-gradient(180deg, #4BA3F3 0%, #B780FF 0.01%, #7F1BFF 100%, #7F1BFF 100%), #7F1BFF;
+         color: #FFF;
+         width: 100%;
+         text-transform: capitalize;
+         letter-spacing: 2px;
+         height: 50px;
+         font-size: 18px;
+     }
+ </style>
+
+ @code {
+    string email = "";
+    string fullName = "";
+    bool IsEmailValid = false;
+    bool IsFullNameValid = false;
+    public IMask emailMask = RegexMask.Email();
+
+    async Task CheckEmail()
+    {
+        IsEmailValid = true;
+        IsFullNameValid = true;
+
+        if (string.IsNullOrEmpty(email))
+        {
+            IsEmailValid = false;
+            return;
+        }
+
+        if (string.IsNullOrEmpty(fullName))
+        {
+            IsFullNameValid = false;
+            return;
+        }
+
+        if (!new Regex(@"^[a-zA-Z].*[\s\.]*$").IsMatch(fullName))
+            IsFullNameValid = false;
+
+        if (!ValidateEmail(email))
+            IsEmailValid = false ;
+
+        if (!IsEmailValid || !IsFullNameValid )
+            return;
+
+        await localStorage.SetItemAsStringAsync("email", email);
+        await localStorage.SetItemAsStringAsync("fullName", fullName);
+
+        NewRegistration newReg = new NewRegistration
+            {
+                Email = email
+            };
+
+        try
+        {
+            //send request to API
+            var response = await RegistrationService.RegistrationAsync(newReg);
+
+            //if success navigate to dashboard
+            if (!response.IsSuccessStatusCode)
+                SnackbarService.Add("E-Mailová adresa je již zabraná", Severity.Error);
+
+            else
+            {
+                //Skip mezi kroku pro aktivaci účtu
+                var skipCode = await RegistrationService.VerifyEmailAsync(email, new AuthenticationCode { Code = "1234" });
+
+                NavigationManager.NavigateTo("/registration/password");
+            }
+
+        }
+        catch
+        {
+            SnackbarService.Add("Něco se nepovedlo", Severity.Error);
+        }
+
+    }
+
+    private bool ValidateEmail(string email)
+    {
+        try
+        {
+            MailAddress m = new MailAddress(email);
+
+            return true;
+        }
+        catch (FormatException)
+        {
+            return false;
+        }
+    }
+
+    private void LoadLoginPage()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}

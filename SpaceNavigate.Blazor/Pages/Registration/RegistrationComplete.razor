@@ -1,0 +1,54 @@
+﻿@page "/registration/complete"
+@using System.Text.RegularExpressions;
+@using System.Net.Mail;
+@inject NavigationManager NavigationManager
+@inject ILocalStorageService localStorage
+@inject ISnackbar SnackbarService
+
+<PageTitle>Registrace dokončena</PageTitle>
+<Logo />
+<MudContainer Class="space-navigate-container">
+    <MudText Class="space-navigate-caption">Vaše výprava může začít!</MudText>
+    <MudText Class="space-navigate-text">Právě jste úspěšně založili Váš profil na platformě SpaceNavigate, nyní se můžete ponořit do prozkoumávání vesmíru.</MudText>
+
+     <MudButton OnClick="NavigateToDashboard" Variant="Variant.Filled" DisableElevation Class="space-navigate-btn mt-10">Prozkoumat vesmír</MudButton>
+ </MudContainer>
+
+ <style media="screen and (max-width:1120px)">
+     .space-navigate-container {
+         margin-top: 5px;
+     }
+
+     .space-navigate-caption {
+         font-size: 32px;
+         margin-top: 45px;
+     }
+
+     .space-navigate-text {
+         font-size: 14px;
+         font-style: normal;
+         font-weight: 400;
+         line-height: 20px; /* 142.857% */
+         width: 100%;
+         margin-top: 20px;
+     }
+
+     .space-navigate-btn {
+         width: 100%;
+         height: 50px;
+         font-size: 18px;
+     }
+ </style>
+ <style media="screen and (min-width:1121px)">
+     .space-navigate-btn {
+         width: 350px;
+     }
+ </style>
+
+ @code {
+
+    async Task NavigateToDashboard()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}
